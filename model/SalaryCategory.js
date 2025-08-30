@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
+import AutoIncrementFactory from "mongoose-sequence";
 
 const SalaryCategorySchema = new mongoose.Schema({
     categoryId:{
         type:Number,
-        required:true,
         unique:true
     },
     categoryName:{
@@ -18,5 +18,8 @@ const SalaryCategorySchema = new mongoose.Schema({
         type:String,
     }
 })
+
+const  AutoIncrement = AutoIncrementFactory(mongoose);
+SalaryCategorySchema.plugin(AutoIncrement,{inc_field:"categoryId"});
 
 export default mongoose.model('SalaryCategory',SalaryCategorySchema);

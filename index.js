@@ -7,9 +7,11 @@ import SalaryCategoryRoute from "./route/SalaryCategoryRoute.js";
 import CashAdvanceRoute from "./route/CashAdvanceRoute.js";
 import BonusRouter from "./route/BonusRouter.js";
 import WorkingHoursRouter from "./route/WorkingHoursRouter.js";
+import cors from 'cors';
 
 dotenv.config();
 const app=express();
+app.use(cors());
 app.use(bodyparser.json());
 const port=process.env.PORT;
 DBConnection();
