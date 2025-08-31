@@ -17,3 +17,33 @@ export async function saveSalaryCategory(req, res){
         })
     }
 }
+
+export async function getAllCategories(req, res){
+    try {
+        const categoryList=await SalaryCategorySchema.find();
+        res.status(200).json({
+            categoryList:categoryList
+        })
+    }catch (e){
+        res.status(500).json(e.message);
+    }
+}
+
+export async function updateCategoryById(req, res){
+    try {
+        const updateCategory=await SalaryCategorySchema.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true
+            }
+        );
+
+        if (updateCategory) {
+            return res.status(200).json(updateCategory);
+        }
+        return res.status(404).json("Customer not found");
+    }catch (e){
+        res.status(500).json(e.message);
+    }
+}
