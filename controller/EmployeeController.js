@@ -61,3 +61,43 @@ export async function updateEmployee(req,res){
     }
 }
 
+export async function getAllEmployeesWithLastWorkingData(req, res) {
+    try {
+        const employees = await EmployeeSchema.aggregate([
+            {
+                $match: { isActive: true }
+            },
+            {
+                $lookup: {
+                    from: "workinghours",
+                    let: { emp_no: "$empNo" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$empNo", "$$emp_no"] } } },
+                        { $sort: { startDateTime: -1 } },
+                        { $limit: 1 }
+                    ],
+                    as: "lastWorkingHour"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$lastWorkingHour",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    lastWorkingHour: { $ifNull: ["$lastWorkingHour", {}] }
+                }
+            }
+        ]);
+        res.status(200).json({
+            employeeList:employees
+        })
+    }catch (e){
+        res.status(500).json({
+            message:e.message
+        });
+    }
+}
+

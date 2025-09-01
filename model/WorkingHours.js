@@ -7,8 +7,6 @@ const WorkingHoursSchema = mongoose.Schema({
     },
     startDateTime:{
         type:Date,
-        required:true,
-        default:Date.now
     },
     endDateTime:{
         type:Date,

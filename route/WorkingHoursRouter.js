@@ -1,8 +1,9 @@
 import express from "express";
-import {saveWorkingHours} from "../controller/WorkingHoursController.js";
+import {saveOurWorkingHours, saveWorkingHours} from "../controller/WorkingHoursController.js";
 
 const router = express.Router();
 
 router.post('/save-in',saveWorkingHours);
+router.post('/save-out:id',saveOurWorkingHours);
 
 export default router;
