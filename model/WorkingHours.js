@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const WorkingHoursSchema = mongoose.Schema({
+    empPrimaryKey:{
+        type:String,
+        required:true,
+    },
     empNo:{
         type:String,
         required:true
@@ -14,6 +18,10 @@ const WorkingHoursSchema = mongoose.Schema({
     status:{
         type:String,
         required:true
+    },
+    isActive:{
+        type:Boolean,
+        default:true
     }
 });
 
