@@ -55,3 +55,29 @@ export async function getEmployeeWorkingHours(req, res) {
         res.status(500).json({ message: e.message });
     }
 }
+
+export async function updateValidity(req, res) {
+    try {
+        // First get the current document
+        const record = await WorkingHoursSchema.findById(req.params.id);
+
+        if (!record) {
+            return res.status(404).json({ message: "Record not found" });
+        }
+
+        // Toggle the value
+        const updated = await WorkingHoursSchema.findByIdAndUpdate(
+            req.params.id,
+            { isActive: !record.isActive },
+            { new: true } // return updated doc
+        );
+
+        return res.status(200).json({
+            message: `isActive updated to ${updated.isActive}`,
+            updated
+        });
+
+    }catch (e){
+        return res.status(500).json({ message: e.message });
+    }
+}
