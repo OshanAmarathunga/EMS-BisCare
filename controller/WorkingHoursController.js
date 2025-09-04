@@ -81,3 +81,28 @@ export async function updateValidity(req, res) {
         return res.status(500).json({ message: e.message });
     }
 }
+
+export  async function addWorkingHours(req, res) {
+    try {
+        const { startDate, endDate, empPrimaryKey } = req.body;
+
+        const employee = await EmployeeSchema.findById(empPrimaryKey, "empNo");
+        if (!employee) {
+            return res.status(404).json({ message: "Employee not found" });
+        }
+
+        const workingHours = new WorkingHoursSchema({
+            empPrimaryKey,
+            empNo: employee.empNo,
+            startDateTime: new Date(startDate).getTime(), // convert ISO → milliseconds
+            endDateTime: new Date(endDate).getTime(),     // convert ISO → milliseconds
+            status: "OUT"
+        });
+
+        const saved = await workingHours.save();
+        res.status(200).json(saved);
+    } catch (e) {
+        console.log(e.message);
+        res.status(500).json(e.message);
+    }
+}
