@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const BonusSchema = new mongoose.Schema({
-    empNo:{
+    empPrimaryKey:{
         type: String,
         required: true
     },
