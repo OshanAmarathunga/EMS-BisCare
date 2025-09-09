@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const CashAdvanceSchema = new mongoose.Schema({
-    empNo:{
+    empNoPrimaryKey:{
         type: String,
         required: true
     },
