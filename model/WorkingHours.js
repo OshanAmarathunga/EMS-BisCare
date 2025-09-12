@@ -22,6 +22,9 @@ const WorkingHoursSchema = mongoose.Schema({
     isActive:{
         type:Boolean,
         default:true
+    },
+    slotEarningAmount:{
+        type:Number
     }
 });
 
