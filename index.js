@@ -8,6 +8,7 @@ import CashAdvanceRoute from "./route/CashAdvanceRoute.js";
 import BonusRouter from "./route/BonusRouter.js";
 import WorkingHoursRouter from "./route/WorkingHoursRouter.js";
 import cors from 'cors';
+import PaymentDetailRouter from "./route/PaymentDetailRouter.js";
 
 dotenv.config();
 const app=express();
@@ -22,6 +23,7 @@ app.use('/v1/salary-category',SalaryCategoryRoute)
 app.use('/v1/cash-advance',CashAdvanceRoute)
 app.use('/v1/bonus',BonusRouter)
 app.use('/v1/working-hour',WorkingHoursRouter)
+app.use('/v1/payment-detail',PaymentDetailRouter)
 //==========================================
 
 app.listen(port,()=>{

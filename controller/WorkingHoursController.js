@@ -1,6 +1,7 @@
 import workingHours from "../model/WorkingHours.js";
 import WorkingHoursSchema from "../model/WorkingHours.js";
 import EmployeeSchema from "../model/EmployeeSchema.js";
+import SalaryCategorySchema from "../model/SalaryCategory.js";
 
 export async function saveWorkingHours(req, res) {
     try{
@@ -20,12 +21,30 @@ export async function saveWorkingHours(req, res) {
 
 export async function saveOurWorkingHours(req, res) {
     try{
+        const date=Date.now();
+        const workingHourSlot = await WorkingHoursSchema.findById(req.params.id);
+        const empPrimaryKey=workingHourSlot.empPrimaryKey;
+
+        const employee = await EmployeeSchema.findById(empPrimaryKey);
+        const salaryCatId=employee.salaryCategoryId;
+
+        const salaryCategory=await SalaryCategorySchema.findOne({
+            categoryId:salaryCatId
+        });
+
+        const categoryRate=salaryCategory.perHourRate;
+        const diffInMs = date - workingHourSlot.startDateTime;
+        const diffInHours = diffInMs / (1000 * 60 * 60);
+        // earning calculation → round UP to int
+        const earningAmount = Math.ceil(diffInHours * categoryRate);
+
 
         const workingHours=await WorkingHoursSchema.findByIdAndUpdate(
             req.params.id,
             {
-                endDateTime:Date.now(),
-                status:"OUT"
+                endDateTime:date,
+                status:"OUT",
+                slotEarningAmount:earningAmount
             },
             { new: true }
 
@@ -33,7 +52,6 @@ export async function saveOurWorkingHours(req, res) {
         if (workingHours){
             res.status(200).json(workingHours);
         }
-        return res.status(200).json();
     }catch (e){
         res.status(500).json(e.message);
     }
@@ -86,17 +104,29 @@ export  async function addWorkingHours(req, res) {
     try {
         const { startDate, endDate, empPrimaryKey } = req.body;
 
-        const employee = await EmployeeSchema.findById(empPrimaryKey, "empNo");
+        const employee = await EmployeeSchema.findById(empPrimaryKey);
         if (!employee) {
             return res.status(404).json({ message: "Employee not found" });
         }
+        const salaryCatId=employee.salaryCategoryId;
+
+        const salaryCategory=await SalaryCategorySchema.findOne({
+            categoryId:salaryCatId
+        });
+
+        const categoryRate=salaryCategory.perHourRate;
+        const diffInMs = new Date(endDate).getTime() - new Date(startDate).getTime();
+        const diffInHours = diffInMs / (1000 * 60 * 60);
+        // earning calculation → round UP to int
+        const earningAmount = Math.ceil(diffInHours * categoryRate);
 
         const workingHours = new WorkingHoursSchema({
             empPrimaryKey,
             empNo: employee.empNo,
             startDateTime: new Date(startDate).getTime(), // convert ISO → milliseconds
             endDateTime: new Date(endDate).getTime(),     // convert ISO → milliseconds
-            status: "OUT"
+            status: "OUT",
+            slotEarningAmount:earningAmount
         });
 
         const saved = await workingHours.save();
