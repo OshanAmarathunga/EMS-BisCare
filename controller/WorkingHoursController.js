@@ -34,7 +34,7 @@ export async function saveOurWorkingHours(req, res) {
 
         const categoryRate=salaryCategory.perHourRate;
         const diffInMs = date - workingHourSlot.startDateTime;
-        const diffInHours = diffInMs / (1000 * 60 * 60);
+        const diffInHours =  parseFloat((diffInMs / (1000 * 60 * 60)).toFixed(2));
         // earning calculation → round UP to int
         const earningAmount = Math.ceil(diffInHours * categoryRate);
 
@@ -44,7 +44,9 @@ export async function saveOurWorkingHours(req, res) {
             {
                 endDateTime:date,
                 status:"OUT",
-                slotEarningAmount:earningAmount
+                slotEarningAmount:earningAmount,
+                relevantRate:categoryRate,
+                workingHours:diffInHours
             },
             { new: true }
 
@@ -59,7 +61,8 @@ export async function saveOurWorkingHours(req, res) {
 
 export async function getEmployeeWorkingHours(req, res) {
     try{
-        const workingHours = await WorkingHoursSchema.find({ empPrimaryKey: req.params.id }).sort({ startDateTime: -1 });
+        const workingHours = await WorkingHoursSchema.find({
+            empPrimaryKey: req.params.id }).sort({ startDateTime: -1 });
 
         const emp = await EmployeeSchema.findById(req.params.id, "firstName");
 
@@ -116,7 +119,7 @@ export  async function addWorkingHours(req, res) {
 
         const categoryRate=salaryCategory.perHourRate;
         const diffInMs = new Date(endDate).getTime() - new Date(startDate).getTime();
-        const diffInHours = diffInMs / (1000 * 60 * 60);
+        const diffInHours =parseFloat((diffInMs / (1000 * 60 * 60)).toFixed(2));
         // earning calculation → round UP to int
         const earningAmount = Math.ceil(diffInHours * categoryRate);
 
@@ -126,7 +129,9 @@ export  async function addWorkingHours(req, res) {
             startDateTime: new Date(startDate).getTime(), // convert ISO → milliseconds
             endDateTime: new Date(endDate).getTime(),     // convert ISO → milliseconds
             status: "OUT",
-            slotEarningAmount:earningAmount
+            slotEarningAmount:earningAmount,
+            relevantRate:categoryRate,
+            workingHours:diffInHours
         });
 
         const saved = await workingHours.save();

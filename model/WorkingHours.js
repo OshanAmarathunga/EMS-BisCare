@@ -25,6 +25,12 @@ const WorkingHoursSchema = mongoose.Schema({
     },
     slotEarningAmount:{
         type:Number
+    },
+    relevantRate:{
+        type:Number
+    },
+    workingHours:{
+        type:Number
     }
 });
 
