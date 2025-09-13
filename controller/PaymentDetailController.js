@@ -131,13 +131,61 @@ async function getAllEarningAmount(employee) {
 export async function employeePayment(req, res) {
     try {
         const payment=new PaymentDetailSchema({
-            empPrimaryKey:req.body.empNoPrimaryKey,
+            empPrimaryKey:req.body.empPrimaryKey,
             amount:req.body.amount
         });
         const newVar = await payment.save();
         res.status(200).json(newVar);
     }catch (e){
         res.status(500).send(e.message)
+        console.log(e);
     }
 }
+export async function getEmployeePayment(req, res) {
+    try {
+        const paymentList = await PaymentDetailSchema.find({
+            empPrimaryKey: req.params.id
+        }).sort({date:-1});
+
+        const truePaymentList = await PaymentDetailSchema.find({
+            empPrimaryKey: req.params.id,
+            status:true
+        }).sort({date:-1});
+
+        const employee= await EmployeeSchema.findById(req.params.id)
+
+        const totalAmount = truePaymentList.reduce((sum, ca) => sum + ca.amount, 0);
+
+        const totalCashAdvancedAmount=await getAllCashAdvancedAmount(employee);
+        const totalBonusAmount=await getAllBonusAmount(employee);
+        const paidAmount=await  getAllPaidAmount(employee);
+        const totalEarningAmount=await getAllEarningAmount(employee);
+
+        const response={
+            balanceAmount:(((totalEarningAmount-totalCashAdvancedAmount)+totalBonusAmount)-paidAmount),
+            paymentList:paymentList,
+            totalPaidAmount:totalAmount
+        }
+        return res.status(200).json(response);
+    }catch (e){
+        console.error("Error in getAllEarningAmount:", e.message);
+    }
+}
+
+export async function changePaymentStatus(req,res){
+    try{
+        const payment=await PaymentDetailSchema.findById(req.params.id);
+
+        await PaymentDetailSchema.findByIdAndUpdate(
+            req.params.id,
+            {status:!payment.status},
+            {new:true}
+        );
+        return res.status(200).json("updated");
+
+    }catch(e){
+        return res.status(500).json({ message: e.message });
+    }
+}
+
 
